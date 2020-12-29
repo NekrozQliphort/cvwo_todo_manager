@@ -1,24 +1,9 @@
-# README
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+# CVWO Assignment: Riding on Rails
+### To Do Manager
+##### Ryan Chung Yi Sheng (A0219702J)
+To do list of features:\
+&#9744; CRUD For Tasks\
+&#9744; CRUD For Taggings\
+&#9744; Associate Tasks and Taggings\
+&#9744; Search and Filter\
+&#9744; Optional: Login
