@@ -34,6 +34,7 @@ default: &default
     - .woff2
 
   extensions:
+    - .jsx
     - .mjs
     - .js
     - .sass
@@ -47,7 +48,7 @@ default: &default
     - .gif
     - .jpeg
     - .jpg
-
+    
 development:
   <<: *default
   compile: true
