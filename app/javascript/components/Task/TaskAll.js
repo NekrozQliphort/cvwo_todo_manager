@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ax from 'packs/ax'
 import _ from 'lodash'
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core'
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Link } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles({
@@ -22,13 +22,13 @@ const TaskAll = () => {
 
   useEffect(updateTasks, [])
 
-  const taskRows = _.map(tasks, (task, index) => {
+  const taskRows = _.map(_.orderBy(tasks, 'deadline'), (task, index) => {
     const deadlineDate = new Date(task.deadline)
     return (
       <TableRow key={index}>
         <TableCell>{task.title}</TableCell>
         <TableCell>{`${deadlineDate.getDate()}/${deadlineDate.getMonth() + 1}/${deadlineDate.getFullYear()}`}</TableCell>
-        <TableCell></TableCell>
+        <TableCell><Button component={Link} to={'/edit/' + task.id}>Edit</Button></TableCell>
       </TableRow>
     )
   })
