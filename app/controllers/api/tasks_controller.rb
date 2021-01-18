@@ -13,11 +13,11 @@ module Api
         render json: { error: task.errors }, status: 422
       end
     end
-  end
 
-  private
+    private
 
-  def create_params
-    params.require(:task).permit(:title, :content, :deadline)
+    def create_params
+      params.require(:task).permit(:title, :remarks, :deadline)
+    end
   end
 end
