@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(version: 2021_01_07_180747) do
     t.string "title"
     t.text "remarks"
     t.datetime "deadline"
-    t.boolean "completed"
+    t.boolean "completed", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

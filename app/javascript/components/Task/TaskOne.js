@@ -10,7 +10,7 @@ const TaskOne = props => {
     return (
       <>
         <Typography>{label}</Typography>
-        <TextField onChange={handleTaskAttr(attr)} variant="outlined" fullWidth={fullWidth} multiline rowsMax={rowsMax} />
+        <TextField onChange={handleTaskAttr(attr)} variant="outlined" fullWidth={fullWidth} multiline rowsMax={rowsMax} defaultValue={task[attr]} />
       </>
     )
   }
@@ -29,7 +29,7 @@ const TaskOne = props => {
         value={task.deadline}
         onChange={handleDateChange}
         disablePast
-        format="yyyy/MM/dd HH:mm"
+        format="dd/MM/yyyy HH:mm"
         />
       </MuiPickersUtilsProvider>
       <Box>
