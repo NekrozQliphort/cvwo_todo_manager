@@ -7,4 +7,6 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 Task.create(title: 'Study', remarks: 'Physics, Maths and Whatever', deadline: Date.new(2021, 2, 3))
-Task.create(title: 'Study Again', remarks: 'STFU', deadline: Date.new(2021, 1, 27))
+t2 = Task.new(title: 'Study Again', remarks: 'STFU', deadline: Date.new(2021, 1, 27))
+t2.save
+t2.tags.create([{ name: 'Tag1' }, { name: 'Tag2' }])
