@@ -1,7 +1,7 @@
 module Api
   class TasksController < ApplicationController
     def index
-      tasks = Task.where({ completed: false })
+      tasks = Task.includes(:tags).all.as_json(include: :tags)
       render json: tasks
     end
 
@@ -49,7 +49,7 @@ module Api
     private
 
     def task_params
-      params.require(:task).permit(:title, :remarks, :deadline)
+      params.require(:task).permit(:title, :remarks, :deadline, added_tags: [:name], deleted_tags: [:name])
     end
   end
 end
