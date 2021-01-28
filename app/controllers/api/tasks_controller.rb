@@ -7,24 +7,34 @@ module Api
 
     def create
       task = Task.new(task_params)
-      if task.save
-        render json: task
-      else
+      begin
+        task.transaction do
+          task.save!
+          task.tags = tags_params.map { |tag_params| Tag.where(tag_params).first_or_create!(tag_params) }
+        end
+      rescue ActiveRecord::RecordInvalid => e
         render json: { error: task.errors }, status: 422
+        return
       end
+      render json: task
     end
 
     def update
       task = Task.find(params[:id])
-      if task.update(task_params)
-        render json: task
-      else
+      begin
+        task.transaction do
+          task.update!(task_params)
+          task.tags = tags_params.map { |tag_params| Tag.where(tag_params).first_or_create!(tag_params) }
+        end
+      rescue ActiveRecord::RecordInvalid => e
         render json: { error: task.errors }, status: 422
+        return
       end
+      render json: task
     end
 
     def show
-      task = Task.find(params[:id])
+      task = Task.includes(:tags).find(params[:id]).as_json(include: :tags)
       render json: task
     end
 
@@ -49,7 +59,11 @@ module Api
     private
 
     def task_params
-      params.require(:task).permit(:title, :remarks, :deadline, added_tags: [:name], deleted_tags: [:name])
+      params.require(:task).permit(:title, :remarks, :deadline)
+    end
+
+    def tags_params
+      params[:tags].empty? ? [] : params.require(:tags).map { |p| p.permit(:name) }
     end
   end
 end
