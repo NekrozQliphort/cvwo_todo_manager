@@ -7,7 +7,7 @@ const EditTask = props => {
 
   const updateTask = () => {
     ax.get('/api/tasks/' + props.match.params.id)
-      .then(resp => { console.log(resp.data); setTask(resp.data) })
+      .then(resp => setTask(resp.data))
       .catch(resp => console.log(resp))
   }
 

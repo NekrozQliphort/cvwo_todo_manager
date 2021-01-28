@@ -103,7 +103,7 @@ const TaskAll = () => {
       <TableRow key={index}>
         <TableCell>{task.title}</TableCell>
         <TableCell>{`${deadlineDate.getDate()}/${deadlineDate.getMonth() + 1}/${deadlineDate.getFullYear()} ${dateTimeFormat(deadlineDate)}`}</TableCell>
-        <TableCell><Checkbox checked={task.completed} onChange={() => markCompleted(task.id)}/></TableCell>
+        <TableCell><Checkbox color='primary' checked={task.completed} onChange={() => markCompleted(task.id)}/></TableCell>
         <TableCell><Button component={Link} href={'/edit/' + task.id}>Edit</Button></TableCell>
         <TableCell><Button onClick={() => deleteTasks(task.id)}>Delete</Button></TableCell>
       </TableRow>
@@ -123,7 +123,7 @@ const TaskAll = () => {
         </Toolbar>
       </AppBar>
       <div className={classes.addTaskWrapper}>
-        <Button color='secondary' href={'/new'} className={[classes.buttonRight, classes.addTaskButton].join(' ')}><Add/>Add Task</Button>
+        <Button href={'/new'} className={[classes.buttonRight, classes.addTaskButton].join(' ')}><Add/>Add Task</Button>
       </div>
       <TableContainer component={Paper} elevation={4} className={classes.tableWrapper} >
         <Table className={classes.table}>

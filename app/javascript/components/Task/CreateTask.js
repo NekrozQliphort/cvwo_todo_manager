@@ -3,7 +3,7 @@ import ax from 'packs/ax'
 import TaskOne from './TaskOne'
 
 const CreateTask = props => {
-  const [task, setTask] = useState({ title: '', remarks: '', deadline: new Date(), completed: false })
+  const [task, setTask] = useState({ title: '', remarks: '', deadline: new Date(), completed: false, tags: [] })
 
   const handleSubmit = e => {
     ax.post('/api/tasks', task)
