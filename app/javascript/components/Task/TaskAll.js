@@ -3,9 +3,9 @@ import ax from 'packs/ax'
 import _ from 'lodash'
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Link,
-  Checkbox, InputBase, IconButton, AppBar, Toolbar
+  Checkbox, InputBase, IconButton, AppBar, Toolbar, Select, MenuItem, Divider
 } from '@material-ui/core'
-import { Search, Add } from '@material-ui/icons'
+import { Search, Add, Clear } from '@material-ui/icons'
 import { makeStyles, fade } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
@@ -59,6 +59,7 @@ const TaskAll = () => {
   const [tasks, setTasks] = useState([])
   const [tempText, setTempText] = useState('')
   const [searchText, setSearchText] = useState('')
+  const [searchBy, setSearchBy] = useState('Name')
   const classes = useStyles()
 
   function updateTasks () {
@@ -94,28 +95,54 @@ const TaskAll = () => {
 
   function search () {
     setSearchText(tempText)
-    setTempText('')
   }
 
-  const TaskRows = () => _.map(_.filter(tasks, task => searchText === '' || task.tags.some(e => e.name === searchText)), (task, index) => {
-    const deadlineDate = new Date(task.deadline)
-    return (
-      <TableRow key={index}>
-        <TableCell>{task.title}</TableCell>
-        <TableCell>{`${deadlineDate.getDate()}/${deadlineDate.getMonth() + 1}/${deadlineDate.getFullYear()} ${dateTimeFormat(deadlineDate)}`}</TableCell>
-        <TableCell><Checkbox color='primary' checked={task.completed} onChange={() => markCompleted(task.id)}/></TableCell>
-        <TableCell><Button component={Link} href={'/edit/' + task.id}>Edit</Button></TableCell>
-        <TableCell><Button onClick={() => deleteTasks(task.id)}>Delete</Button></TableCell>
-      </TableRow>
-    )
-  })
+  function searchWrapper (e) {
+    if (e.type === 'keydown' && e.key === 'Enter') {
+      search()
+    }
+  }
+
+  const handleOptionsSelect = e => setSearchBy(e.target.value)
+
+  const TaskRows = () => {
+    const searchFunc = (searchBy === 'Tags'
+      ? task => searchText === '' || task.tags.some(e => e.name === searchText)
+      : task => searchText === '' || task.title.toLowerCase().includes(searchText.toLowerCase()))
+    return (_.map(_.filter(tasks, searchFunc), (task, index) => {
+      const deadlineDate = new Date(task.deadline)
+      return (
+        <TableRow key={index}>
+          <TableCell>{task.title}</TableCell>
+          <TableCell>{`${deadlineDate.getDate()}/${deadlineDate.getMonth() + 1}/${deadlineDate.getFullYear()} ${dateTimeFormat(deadlineDate)}`}</TableCell>
+          <TableCell><Checkbox color='primary' checked={task.completed} onChange={() => markCompleted(task.id)}/></TableCell>
+          <TableCell><Button component={Link} href={'/edit/' + task.id}>Edit</Button></TableCell>
+          <TableCell><Button onClick={() => deleteTasks(task.id)}>Delete</Button></TableCell>
+        </TableRow>
+      )
+    }))
+  }
 
   return (
     <Box>
       <AppBar position="relative" elevation={4}>
         <Toolbar color='primary'>
           <Paper className={classes.search}>
-            <InputBase placeholder="Search" className={classes.searchInput} onChange = {e => setTempText(e.target.value)} value={tempText}/>
+            <Select
+              value={searchBy}
+              onChange={handleOptionsSelect}
+              disableUnderline
+            >
+              <MenuItem value={'Name'}>Name</MenuItem>
+              <MenuItem value={'Tags'}>Tags</MenuItem>
+            </Select>
+            <Divider orientation="vertical" style={{ marginLeft: '12px', marginRight: '12px' }} flexItem />
+            <InputBase placeholder="Search" className={classes.searchInput} onChange = {e => setTempText(e.target.value)} value={tempText} onKeyDown={searchWrapper}/>
+            {(searchText !== '' && (
+              <IconButton className={classes.buttonRight} onClick={() => { setTempText(''); setSearchText('') }}>
+                <Clear />
+              </IconButton>
+            ))}
             <IconButton className={classes.buttonRight} onClick={search}>
               <Search />
             </IconButton>
