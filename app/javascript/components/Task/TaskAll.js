@@ -9,11 +9,8 @@ import { Search, Add, Clear } from '@material-ui/icons'
 import { makeStyles, fade } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
-  table: {
-    minWidth: 500
-  },
   search: {
-    width: '50%',
+    width: window.innerWidth < 478 ? '80%' : '50%',
     display: 'flex',
     padding: theme.spacing(0, 2),
     borderRadius: theme.shape.borderRadius,
@@ -177,7 +174,7 @@ const TaskAll = () => {
         <Button href={'/new'} className={[classes.buttonRight, classes.addTaskButton].join(' ')}><Add/>Add Task</Button>
       </div>
       <TableContainer component={Paper} elevation={4} className={classes.tableWrapper} >
-        <Table className={classes.table}>
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell><strong>Task</strong></TableCell>
