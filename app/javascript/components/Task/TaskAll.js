@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Fragment } from 'react'
 import ax from 'packs/ax'
 import _ from 'lodash'
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Link,
-  Checkbox, InputBase, IconButton, AppBar, Toolbar, Select, MenuItem, Divider, Radio, FormControlLabel
+  Checkbox, InputBase, IconButton, AppBar, Toolbar, Select, MenuItem, Divider, Radio, FormControlLabel,
+  Collapse, Typography, Chip
 } from '@material-ui/core'
-import { Search, Add, Clear } from '@material-ui/icons'
+import { Search, Add, Clear, KeyboardArrowUp, KeyboardArrowDown } from '@material-ui/icons'
 import { makeStyles, fade } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
@@ -49,6 +50,17 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 'auto',
     position: 'relative',
     top: -30
+  },
+  tagChips: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: theme.spacing(0.5),
+    margin: 0,
+    justifyContent: 'center'
+  },
+  chip: {
+    margin: theme.spacing(0.5)
   }
 }))
 
@@ -118,14 +130,54 @@ const TaskAll = () => {
       : task => searchText === '' || task.title.toLowerCase().includes(searchText.toLowerCase()))
     return (_.map(_.filter(displayCat === 'ongoing' ? tasks : completedTasks, searchFunc), (task, index) => {
       const deadlineDate = new Date(task.deadline)
+      const [open, setOpen] = useState(false)
       return (
-        <TableRow key={index}>
-          <TableCell>{task.title}</TableCell>
-          <TableCell>{`${deadlineDate.getDate()}/${deadlineDate.getMonth() + 1}/${deadlineDate.getFullYear()} ${dateTimeFormat(deadlineDate)}`}</TableCell>
-          <TableCell><Checkbox color='primary' disabled={displayCat !== 'ongoing'} checked={task.completed} onChange={() => markCompleted(task)}/></TableCell>
-          <TableCell><Button component={Link} href={'/edit/' + task.id}>Edit</Button></TableCell>
-          <TableCell><Button onClick={() => deleteTasks(task.id)}>Delete</Button></TableCell>
-        </TableRow>
+        <Fragment key={index}>
+          <TableRow>
+            <TableCell>{task.title}</TableCell>
+            <TableCell>{`${deadlineDate.getDate()}/${deadlineDate.getMonth() + 1}/${deadlineDate.getFullYear()} ${dateTimeFormat(deadlineDate)}`}</TableCell>
+            <TableCell><Checkbox color='primary' disabled={displayCat !== 'ongoing'} checked={task.completed} onChange={() => markCompleted(task)}/></TableCell>
+            <TableCell>
+              <IconButton asize="small" onClick={() => setOpen(!open)}>
+                {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+              </IconButton>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                <Box style={{ paddingBottom: 10, paddingTop: 10 }}>
+                  <Box component="ul" className={classes.tagChips}>
+                    {_.map(task.tags, tag => <li key ={tag.name}><Chip label={tag.name} color='primary' className={classes.chip} /></li>)}
+                  </Box>
+                  <Typography variant='h6' align='center'>{task.remarks}</Typography>
+                  {displayCat === 'ongoing' &&
+                  (<Fragment className={classes.buttonRight}>
+                    <Box display='flex'>
+                      <Box className={classes.buttonRight}>
+                        <Button
+                        color='primary'
+                        variant='outlined'
+                        component={Link} href={'/edit/' + task.id}
+                        style={{ textDecoration: 'none', marginRight: 10 }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                        color='primary'
+                        variant='outlined'
+                        onClick={() => deleteTasks(task.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Fragment>)}
+                </Box>
+              </Collapse>
+            </TableCell>
+          </TableRow>
+        </Fragment>
       )
     }))
   }
@@ -180,7 +232,6 @@ const TaskAll = () => {
               <TableCell><strong>Task</strong></TableCell>
               <TableCell><strong>Deadline</strong></TableCell>
               <TableCell><strong>Completed</strong></TableCell>
-              <TableCell></TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
