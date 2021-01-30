@@ -152,7 +152,7 @@ const TaskAll = () => {
                   </Box>
                   <Typography variant='h6' align='center'>{task.remarks}</Typography>
                   {displayCat === 'ongoing' &&
-                  (<Fragment className={classes.buttonRight}>
+                  (<Fragment>
                     <Box display='flex'>
                       <Box className={classes.buttonRight}>
                         <Button

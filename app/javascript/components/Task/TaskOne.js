@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Grid, TextField, Button, Typography, Box, Container } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
 import ChipInput from 'material-ui-chip-input'
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { makeStyles } from '@material-ui/core/styles'
@@ -21,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
 
 const TaskOne = props => {
   const { task, setTask, handleSubmit, edit } = props
+  const [error, setError] = useState(false)
   const classes = useStyles()
 
   const handleTaskAttr = attr => e => setTask({ ...task, [attr]: e.target.value })
@@ -39,8 +41,13 @@ const TaskOne = props => {
     )
   }
 
+  const handleValidateSubmit = e => {
+    if (task.title === '' || task.deadline < new Date()) { setError(true) } else { handleSubmit(e) }
+  }
+
   return (
     <Container maxWidth='md' className={classes.form}>
+      {(error) && (<Alert severity="error">Please make sure your input is valid!</Alert>) }
       <Grid container direction='row'>
         <Typography color='primary' variant='h4'><strong>{edit ? 'Edit Task' : 'New Task'}</strong></Typography>
       </Grid>
@@ -74,7 +81,7 @@ const TaskOne = props => {
         </MuiPickersUtilsProvider>
       </Box>
       <Box >
-        <Button onClick={handleSubmit} className={classes.submitButton}>{edit ? 'Save Changes' : 'Create New Task'}</Button>
+        <Button onClick={handleValidateSubmit} color='primary' variant='outlined' className={classes.submitButton}>{edit ? 'Save Changes' : 'Create New Task'}</Button>
       </Box>
     </Container>
   )
