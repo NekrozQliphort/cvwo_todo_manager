@@ -3,7 +3,7 @@ import ax from 'packs/ax'
 import _ from 'lodash'
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Link,
-  Checkbox, InputBase, IconButton, AppBar, Toolbar, Select, MenuItem, Divider
+  Checkbox, InputBase, IconButton, AppBar, Toolbar, Select, MenuItem, Divider, Radio, FormControlLabel
 } from '@material-ui/core'
 import { Search, Add, Clear } from '@material-ui/icons'
 import { makeStyles, fade } from '@material-ui/core/styles'
@@ -57,6 +57,8 @@ const useStyles = makeStyles((theme) => ({
 
 const TaskAll = () => {
   const [tasks, setTasks] = useState([])
+  const [completedTasks, setCompletedTasks] = useState([])
+  const [displayCat, setDisplayCat] = useState('ongoing')
   const [tempText, setTempText] = useState('')
   const [searchText, setSearchText] = useState('')
   const [searchBy, setSearchBy] = useState('Name')
@@ -64,7 +66,10 @@ const TaskAll = () => {
 
   function updateTasks () {
     ax.get('/api/tasks')
-      .then(resp => setTasks(_.orderBy(resp.data, 'deadline')))
+      .then(resp => {
+        setTasks(_.orderBy(resp.data.ongoing, 'deadline'))
+        setCompletedTasks(_.orderBy(resp.data.completed, 'deadline'))
+      })
       .catch(resp => console.log(resp))
   }
 
@@ -72,13 +77,18 @@ const TaskAll = () => {
 
   function deleteTasks (id) {
     ax.delete('/api/tasks/' + id)
-      .then(resp => setTasks(_.filter(tasks, task => task.id !== id)))
+      .then(resp => displayCat === 'ongoing'
+        ? setTasks(_.filter(tasks, task => task.id !== id))
+        : setCompletedTasks(_.filter(completedTasks, task => task.id !== id)))
       .catch(resp => console.log(resp))
   }
 
-  function markCompleted (id) {
-    ax.patch('/api/tasks/mark_completed/' + id)
-      .then(resp => setTasks(_.filter(tasks, task => task.id !== id)))
+  function markCompleted (completedTask) {
+    ax.patch('/api/tasks/mark_completed/' + completedTask.id)
+      .then(resp => {
+        setTasks(_.filter(tasks, task => task.id !== completedTask.id))
+        setCompletedTasks(_.orderBy([...completedTasks, { ...completedTask, completed: true }], 'deadline'))
+      })
       .catch(resp => console.log(resp))
   }
 
@@ -109,19 +119,32 @@ const TaskAll = () => {
     const searchFunc = (searchBy === 'Tags'
       ? task => searchText === '' || task.tags.some(e => e.name === searchText)
       : task => searchText === '' || task.title.toLowerCase().includes(searchText.toLowerCase()))
-    return (_.map(_.filter(tasks, searchFunc), (task, index) => {
+    return (_.map(_.filter(displayCat === 'ongoing' ? tasks : completedTasks, searchFunc), (task, index) => {
       const deadlineDate = new Date(task.deadline)
       return (
         <TableRow key={index}>
           <TableCell>{task.title}</TableCell>
           <TableCell>{`${deadlineDate.getDate()}/${deadlineDate.getMonth() + 1}/${deadlineDate.getFullYear()} ${dateTimeFormat(deadlineDate)}`}</TableCell>
-          <TableCell><Checkbox color='primary' checked={task.completed} onChange={() => markCompleted(task.id)}/></TableCell>
+          <TableCell><Checkbox color='primary' disabled={displayCat !== 'ongoing'} checked={task.completed} onChange={() => markCompleted(task)}/></TableCell>
           <TableCell><Button component={Link} href={'/edit/' + task.id}>Edit</Button></TableCell>
           <TableCell><Button onClick={() => deleteTasks(task.id)}>Delete</Button></TableCell>
         </TableRow>
       )
     }))
   }
+
+  const Categories = () => (
+    <>
+      <FormControlLabel
+        control={<Radio color="primary" checked={displayCat === 'ongoing'} onChange={() => setDisplayCat('ongoing')} />}
+        label="Ongoing"
+      />
+      <FormControlLabel
+        control={<Radio color="primary" checked={displayCat === 'completed'} onChange={() => setDisplayCat('completed')} />}
+        label="Completed"
+      />
+    </>
+  )
 
   return (
     <Box>
@@ -150,6 +173,7 @@ const TaskAll = () => {
         </Toolbar>
       </AppBar>
       <div className={classes.addTaskWrapper}>
+        <Categories />
         <Button href={'/new'} className={[classes.buttonRight, classes.addTaskButton].join(' ')}><Add/>Add Task</Button>
       </div>
       <TableContainer component={Paper} elevation={4} className={classes.tableWrapper} >

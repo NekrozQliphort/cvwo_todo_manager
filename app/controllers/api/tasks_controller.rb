@@ -1,8 +1,9 @@
 module Api
   class TasksController < ApplicationController
     def index
-      tasks = Task.includes(:tags).all.as_json(include: :tags)
-      render json: tasks
+      ongoing_tasks = Task.includes(:tags).where('deadline > ? AND completed = ?', DateTime.now, false).as_json(include: :tags)
+      completed_tasks = Task.includes(:tags).where(completed: true).as_json(include: :tags)
+      render json: { ongoing: ongoing_tasks, completed: completed_tasks }
     end
 
     def create
