@@ -1,3 +1,4 @@
+# Modified from https://github.com/jahangiranwari/rails5-docker-heroku/blob/master/Dockerfile
 FROM ruby:2.6.6
 
 ARG INSTALL_DEPENDENCIES
